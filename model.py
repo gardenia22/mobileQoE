@@ -20,7 +20,14 @@ from sklearn import linear_model as lm
 from feature_label import labels
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+
 def to_categorical(labels,num_class=12):
+    '''
+    transfrom label to one-hot encoding target
+    :param labels:
+    :param num_class:
+    :return:
+    '''
     y_binary = np.zeros((len(labels),num_class))
     labels = list(labels)
     for i in range(len(labels)):
@@ -128,6 +135,12 @@ def get_feature_importance(weight, feature_names):
     return fw,bfw
 
 def mape(y_truth, y_pred):
+    '''
+    calculate mean absolute percentage error
+    :param y_truth:
+    :param y_pred:
+    :return: mape
+    '''
     count = 0
     sum = 0
     for p,t in zip(list(y_pred), list(y_truth)):
@@ -145,6 +158,12 @@ def abs_error(y_truth, y_pred):
     return ret
 
 def acc(y_truth, y_pred):
+    '''
+    calculate accuracy
+    :param y_truth:
+    :param y_pred:
+    :return: accuracy
+    '''
     count = 0
     tot = 0
     for p,t in zip(list(y_pred), list(y_truth)):
@@ -154,6 +173,10 @@ def acc(y_truth, y_pred):
     return count*1.0/tot
 
 def predict_dl(pred):
+    '''
+    :param pred: predict result from deep learning model
+    :return: predict class from deep learning model(highest predict socre)
+    '''
     p = []
     for x in pred:
         ans = 1
@@ -181,6 +204,11 @@ def run_model(train_X, train_y, test_X, test_y):
     #plot_confusion_matrix(cm, classes=range(1,12), normalize=True, title='Normalized confusion matrix')
 
 def split_qoe(data):
+    '''
+    split dataset by QoE buffer time and buffer event
+    :param data:
+    :return:
+    '''
     good_qoe = data[data['M']==0][data['N']==0]
     poor_qoe = data[data['N']!=0]
     return good_qoe, poor_qoe
@@ -195,5 +223,5 @@ if __name__=="__main__":
 
     train_X, train_y, test_X, test_y = get_trainset(train_good, test_good)
     run_model(train_X, train_y, test_X, test_y)
-# train_X, train_y, test_X, test_y = get_trainset(train_poor, test_poor)
-# run_model(train_X, train_y, test_X, test_y)
+    train_X, train_y, test_X, test_y = get_trainset(train_poor, test_poor)
+    run_model(train_X, train_y, test_X, test_y)

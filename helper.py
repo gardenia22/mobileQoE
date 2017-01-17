@@ -13,6 +13,11 @@ import json
 from gensim.models import Word2Vec
 all_features = ['_ipispid_v', '_ipgid_v', 'B_v', 'C_v', 'F_v', 'K_v', 'R_v', '_X_v', 'C1_v', 'D1_v', 'FT_v', 'DD_v', 'dp_v', 'Dim_ContentType_G_v', 'Dim_VideoLength_G_v', 'd_FN_v', 'PM_v', 'KL_v', 'PT_v', 'D3_v', 'F1_v', 'C2_v', 'PK_v', 'F2_v', 'KS_v', 'PP_v', 'AC_v', 'RL_v', 'F3_v', 'PM2_v', 'D7_v', 'D6_v', 'LB_v', 'BD_v', 'PH2_v', 'Tab_v', 'video_w2v_0', 'video_w2v_1', 'video_w2v_2', 'video_w2v_3', 'video_w2v_4', 'video_w2v_5', 'video_w2v_6', 'video_w2v_7', 'video_w2v_8', 'video_w2v_9', 'video_w2v_10', 'video_w2v_11', 'video_w2v_12', 'video_w2v_13', 'video_w2v_14', 'video_w2v_15', 'video_w2v_16', 'video_w2v_17', 'video_w2v_18', 'video_w2v_19', 'user_w2v_0', 'user_w2v_1', 'user_w2v_2', 'user_w2v_3', 'user_w2v_4', 'user_w2v_5', 'user_w2v_6', 'user_w2v_7', 'user_w2v_8', 'user_w2v_9', 'user_w2v_10', 'user_w2v_11', 'user_w2v_12', 'user_w2v_13', 'user_w2v_14', 'user_w2v_15', 'user_w2v_16', 'user_w2v_17', 'user_w2v_18', 'user_w2v_19',  'FN', 'FM', 'FM_class','video_count','user_count',"N","M","L"]
 def raw_to_csv(filename):
+    '''
+    transfrom raw data to csv file
+    :param filename:
+    :return:
+    '''
     columns=["_tms", "_ipv", "_ipi", "_ipa", "_ipc", "_ipp", "_ipt", "_ipispid", "_ipgid", "_udef", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "_X", "C1", "D1", "VVID", "FT", "FN", "DD", "DO", "ut", "dp", "d_F", "d_G", "Dim_LiveOndemand_G", "Dim_Copyright_G", "Dim_SubCategoryId_G", "Dim_ContentType_G", "Dim_VideoLength_G", "d_I", "d_Y1", "d_FN", "PM", "np", "KL", "PT", "D3", "D2", "F1", "C2", "D5", "FM", "K1", "L1", "L2", "L3", "M1", "PW", "PK", "PD", "W1", "W2", "F2", "G1", "KS", "KW", "LH", "LC", "PP", "PV", "AC", "RL", "R1", "R2", "R3", "R4", "D_pure", "_cids", "_cidTV", "D_RTV", "PH", "F3", "S1", "d_S1", "L4", "RU", "PM2", "D7", "D6", "Y7", "C3", "G3", "LB", "W4", "W5", "ZT", "BC", "BD", "BE", "rdch", "S1", "F", "d_S1", "TC1", "TC2", "TC3", "TC4", "TC0", "DR", "PH2", "Tab", "_pdt", "_pho"]
     #columns = ["_tms", "_ipv", "_ipi", "_ipa", "_ipc", "_ipp", "_ipt", "_ipispid", "_ipgid", "_udef", "B", "C", "D", "E", "F", "G", "H", "_C", "_D", "_E", "_F", "_G", "_H", "_I", "_J", "_K", "_L", "_M", "_N", "_O", "_P", "_Q", "_R", "_S", "_T", "_U", "_V", "_W", "_X", "_Y", "_Z", "_A1", "_B1", "_C1", "_D1", "_E1", "_F1", "_G1", "_J1", "_K1", "_L1", "_M1", "_N1", "_O1", "_P1", "_Q1", "_R1", "_S1", "_T1", "_K2", "_L2", "_O2", "_pdt", "_pho"]
     out = open(filename.split('.')[0]+'.csv','w')
@@ -42,6 +47,10 @@ def raw_to_csv(filename):
     f.close()
 
 def vvid(url):
+    '''
+    :param url:
+    :return: extract vvid in url
+    '''
     par = urlparse.parse_qs(urlparse.urlparse(url).query)
     if 'vvid' in par:
         return par['vvid'][0]
@@ -72,7 +81,9 @@ def map_func(d):
         count += 1
     f = lambda x:label[x]
     return f
+
 feature_names = []
+
 def encode_str(train, test, key):
     d = Counter(train[key].fillna(-42))
     d += Counter(test[key].fillna(-42))
@@ -81,7 +92,14 @@ def encode_str(train, test, key):
     return train, test
 
 def addWord2vec(data, v_model, u_model, data_u, data_v):
-
+    '''
+    :param data: dataset contains key "H"(video id), "D"(user id)
+    :param v_model: video word2vec model
+    :param u_model: user word2vec model
+    :param data_u:
+    :param data_v:
+    :return: dataset with word2vec and popularity features
+    '''
     vd = data['H'].apply(lambda x: unicode(str(x), 'utf-8'))
     v_matrix = vd.apply(lambda x: v_model[x] if x in v_model.vocab else v_model.seeded_vector(x))
     data['video_count'] = vd.apply(lambda x: len(data_v[x]) if x in data_v else 0)
@@ -97,6 +115,10 @@ def addWord2vec(data, v_model, u_model, data_u, data_v):
 
 
 def map_viewTime(x):
+    '''
+    :param x: view time(continuous type)
+    :return: discreet class of view time
+    '''
     x = x/60
     if x<2:
         return 0
@@ -131,6 +153,12 @@ def encode_target(data):
     return data
 
 def get_trainset(train, test):
+    '''
+    :param train: training dataset for training model
+    :param test: test dataset for testing accuracy of the model
+    :return: train_X train_y,test_X, test_y, X contains all the features(input for model),
+    y contains the targets.
+    '''
     v_model = Word2Vec.load('/Volumes/SQ/word2vec/video_model_20')
     u_model = Word2Vec.load('/Volumes/SQ/word2vec/user_model_20')
     f_u = open('/Volumes/SQ/word2vec/user_160914_cn.json', "r")
@@ -161,7 +189,6 @@ def get_trainset(train, test):
     #     train, test = bin(train, test, f)
     enc = OneHotEncoder(handle_unknown='ignore', n_values='auto', dtype=np.int)
     new_features = map(lambda x:x+'_v',features)
-
 
     for f in features:
         d = Counter(train[f].fillna(-42))
